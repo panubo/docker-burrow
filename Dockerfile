@@ -1,4 +1,4 @@
-FROM alpine:latest as build
+FROM alpine:latest
 
 ENV BURROW_VERSION=1.2.2 BURROW_CHECKSUM=70ef622ba565e92c1193bfad34a09f09435d6262a371f9599113f4fe9d5c4fe8
 
