@@ -1,18 +1,34 @@
 FROM alpine:latest as build
 
-ENV BURROW_RELEASE=1.1.0 BURROW_CHECKSUM=16f803ca88d5847cd387cb12002b5ab4324fb87448d6b9aef09e2c52ae1f77be
+ENV BURROW_VERSION=1.2.2 BURROW_CHECKSUM=70ef622ba565e92c1193bfad34a09f09435d6262a371f9599113f4fe9d5c4fe8
 
-RUN apk add curl bash
+RUN set -x \
+  && apk add --no-cache curl bash \
+  ;
 
-RUN cd /tmp \
-  && curl -sSf -L https://github.com/linkedin/Burrow/releases/download/v${BURROW_RELEASE}/Burrow_${BURROW_RELEASE}_linux_amd64.tar.gz -o burrow.tgz \
+RUN set -x \
+  && cd /tmp \
+  && curl -sSf -L https://github.com/linkedin/Burrow/releases/download/v${BURROW_VERSION}/Burrow_${BURROW_VERSION}_linux_amd64.tar.gz -o burrow.tgz \
   && printf "%s  %s\n" "${BURROW_CHECKSUM}" "burrow.tgz" > /tmp/CHECKSUM \
   && sha256sum burrow.tgz \
   && ( cd /tmp; sha256sum -c CHECKSUM; ) \
-  && tar -xzf burrow.tgz
+  && tar -xzf burrow.tgz \
+  ;
 
-# Not static: https://github.com/linkedin/Burrow/issues/307
-FROM debian:latest
+# Copy burrow into a final image
+FROM alpine:latest
+
+RUN set -x \
+  && apk add --no-cache ca-certificates wget \
+  && wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub \
+  && wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.29-r0/glibc-2.29-r0.apk \
+  && apk add glibc-2.29-r0.apk \
+  && adduser -D -s /bin/bash user \
+  ;
+
 COPY --from=build /tmp/burrow /burrow
+
 EXPOSE 8000
-ENTRYPOINT ["/burrow"]
+WORKDIR /tmp
+USER user
+CMD ["/burrow", "--config-dir=/conf"]
