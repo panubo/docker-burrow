@@ -24,4 +24,5 @@ RUN set -x \
 EXPOSE 8000
 WORKDIR /tmp
 USER user
-CMD ["/burrow", "--config-dir=/conf"]
+ENTRYPOINT ["/burrow"]
+CMD ["--config-dir=/conf"]
