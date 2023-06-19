@@ -1,3 +1,5 @@
+# DEPRECATED - official docker image now provided by https://github.com/linkedin/burrow
+
 # Burrow Monitor for Kafka
 
 Docker image for [burrow](https://github.com/linkedin/Burrow/). Configuration documentation is available at the [burrow wiki](https://github.com/linkedin/Burrow/wiki/Configuration).
